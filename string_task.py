@@ -8,16 +8,16 @@
 # Example input: 'read'
 # Example output: 'reading'
 
-a=input()
+# a=input()
 def verbing(s):
     if len(s)>=3:  
-        if s[-3: len(s)]=='ing':
+        if s[-3:]=='ing':
             return(s+'ly')
         else:
             return(s+"ing")
     else:
         return(s)
-print(verbing(a))
+# print(verbing(a))
 
 
 # Given a string, find the first appearance of the
@@ -28,17 +28,17 @@ print(verbing(a))
 #
 # Example input: 'This dinner is not that bad!'
 # Example output: 'This dinner is good!'
-a=input()
+# a=input()
 def not_bad(s):
     a=s.find('not')
     b=s.find('bad',a)
     c=""
     if a!=-1 and b!=-1:
-            c=s[0:a]+"good"+s[b+3:len(s)]
+            c=s[0:a]+"good"+s[b+3:]
             return(c)
     else:
             return (s)
-print(not_bad(a))
+# print(not_bad(a))
 
 # Consider dividing a string into two halves.
 # If the length is even, the front and back halves are the same length.
@@ -50,18 +50,12 @@ print(not_bad(a))
 #
 # Example input: 'abcd', 'xy'
 # Example output: 'abxcdy'
-a=input()
-b=input()
+# a=input()
+# b=input()
 def front_back(x, y):
-    xf=""
-    xb=""
-    yf=""
-    yb=""
-    c=""
     xf=x[:(len(x)+1)//2]
     xb=x[len(xf):]
     yf=y[:(len(y)+1)//2]
     yb=y[len(yf):]
-    c=xf+yf+xb+yb
-    return(c)
+    return(xf+yf+xb+yb)
 print(front_back(a,b))
