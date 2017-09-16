@@ -7,7 +7,7 @@
 def remove_adjacent(a):
     b = []
     for i in a:
-        if  len(b) or i!=b[-1]==0 :
+        if  len(b) == 0 or i != b[-1]:
             b.append(i)
     return b
 # b=remove_adjacent(a)
@@ -24,13 +24,13 @@ def linear_merge(a,b):
     j=0
     c=[]
     while i < len(a) or j < len(b):
-        if j>=len(b):
+        if j >= len(b):
             c.append(a[i])
             i+=1
-        elif i>= len(a):
+        elif i >= len(a):
             c.append(b[j])
             j+=1
-        elif a[i]<b[j]:
+        elif a[i] < b[j]:
             c.append(a[i])
             i+=1
         else:
