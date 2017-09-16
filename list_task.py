@@ -7,7 +7,7 @@
 def remove_adjacent(a):
     b = []
     for i in a:
-        if i!=b[-1] or len(b)==0 :
+        if  len(b) or i!=b[-1]==0 :
             b.append(i)
     return b
 # b=remove_adjacent(a)
