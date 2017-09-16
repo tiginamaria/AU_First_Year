@@ -35,7 +35,7 @@ def read_words(filename):
     with open(filename, "r") as f:
         for line in f:
             words.extend(line.split())
-    return (words)
+    return words
 
 def make_bibl(filename):
     bibl={}
@@ -45,7 +45,7 @@ def make_bibl(filename):
             bibl[i]+=1
         else:
             bibl[i]=1
-    return(bibl)
+    return bibl
 
 def print_top(filename):
     bibl = make_bibl(filename)
