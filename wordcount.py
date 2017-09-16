@@ -38,27 +38,27 @@ def read_words(filename):
     return words
 
 def make_bibl(filename):
-    bibl={}
+    bibl = {}
     for i in read_words(filename):
-        i=i.lower()
+        i = i.lower()
         if i in bibl:
-            bibl[i]+=1
+            bibl[i]+= 1
         else:
-            bibl[i]=1
+            bibl[i] = 1
     return bibl
 
 def print_top(filename):
     bibl = make_bibl(filename)
-    l=lambda t: t[1]
-    bibl_sorted=sorted(bibl.items(), key=l, reverse=True)
+    l = lambda t: t[1]
+    bibl_sorted = sorted(bibl.items(), key=l, reverse=True)
     for j, b in bibl[:20]:
-         print(j,b)
+         print(j, b)
         
 def print_words(filename):
     bibl=make_bibl(fiename)
     bibl_sorted= sorted(bibl.keys())
     for j in bibl_sorted:
-         print(j,bibl[j])
+         print(j, bibl[j])
 
 
 
