@@ -10,11 +10,11 @@
 
 # a=input()
 def verbing(s):
-    if len(s)>=3:  
-        if s[-3:]=='ing':
-            return s+'ly'
+    if len(s) >= 3:  
+        if s[-3:] == 'ing':
+            return s + 'ly'
         else:
-            return s+'ing'
+            return s + 'ing'
     else:
         return s
 # print(verbing(a))
@@ -30,9 +30,9 @@ def verbing(s):
 # Example output: 'This dinner is good!'
 # a=input()
 def not_bad(s):
-    a=s.find('not')
-    b=s.find('bad',a)
-    if a!=-1 and b!=-1:
+    a = s.find('not')
+    b = s.find('bad', a)
+    if a != -1 and b != -1:
         return s[:a]+"good"+s[b+3:]
     else:
         return s
@@ -51,9 +51,9 @@ def not_bad(s):
 # a=input()
 # b=input()
 def front_back(x, y):
-    xf=x[:(len(x)+1)//2]
-    xb=x[len(xf):]
-    yf=y[:(len(y)+1)//2]
-    yb=y[len(yf):]
+    xf = x[:(len(x)+ 1)// 2]
+    xb = x[len(xf):]
+    yf = y[:(len(y)+ 1)//2]
+    yb = y[len(yf):]
     return xf+yf+xb+yb
 #print(front_back(a,b))
