@@ -20,22 +20,22 @@ def remove_adjacent(a):
 # x = [int(s) for s in input().split()]
 # y = [int(s) for s in input().split()]
 def linear_merge(a,b):
-    i=0
-    j=0
-    c=[]
+    i = 0
+    j = 0
+    c = []
     while i < len(a) or j < len(b):
         if j >= len(b):
             c.append(a[i])
-            i+=1
+            i += 1
         elif i >= len(a):
             c.append(b[j])
-            j+=1
+            j += 1
         elif a[i] < b[j]:
             c.append(a[i])
-            i+=1
+            i += 1
         else:
             c.append(b[j])
-            j+=1
+            j += 1
     return c
 # c=linear_merge(x,y)
 # print(' '.join([str(i) for i in c]))
