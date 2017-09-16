@@ -7,9 +7,9 @@
 def remove_adjacent(a):
     b = []
     for i in a:
-        if i not in b:
+        if (i!=b[-1]) or (len(a)==0):
             b.append(i)
-    return (b)
+    return b
 # b=remove_adjacent(a)
 # print(' '.join([str(i) for i in b]))
 
@@ -24,18 +24,18 @@ def linear_merge(a,b):
     j=0
     c=[]
     while (i < len(a)) or (j < len(b)):
-            if j>=len(b):
-                c.append(a[i])
-                i=i+1
-            elif i>= len(a):
-                c.append(b[j])
-                j=j+1
-            elif a[i]<b[j]:
-                c.append(a[i])
-                i=i+1
-            else:
-                c.append(b[j])
-                j+=1
-    return (c)
+        if j>=len(b):
+            c.append(a[i])
+            i+=1
+        elif i>= len(a):
+            c.append(b[j])
+            j+=1
+        elif a[i]<b[j]:
+            c.append(a[i])
+            i+=1
+        else:
+            c.append(b[j])
+            j+=1
+    return c
 # c=linear_merge(x,y)
 # print(' '.join([str(i) for i in c]))
