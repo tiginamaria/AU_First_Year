@@ -23,7 +23,7 @@ def linear_merge(a,b):
     i=0
     j=0
     c=[]
-    while (i < len(a)) or (j < len(b)):
+    while i < len(a) or j < len(b):
         if j>=len(b):
             c.append(a[i])
             i+=1
