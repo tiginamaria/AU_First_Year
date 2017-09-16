@@ -12,9 +12,9 @@
 def verbing(s):
     if len(s)>=3:  
         if s[-3:]=='ing':
-            return(s+'ly')
+            return s+'ly'
         else:
-            return(s+"ing")
+            return s+'ing'
     else:
         return s
 # print(verbing(a))
@@ -33,8 +33,7 @@ def not_bad(s):
     a=s.find('not')
     b=s.find('bad',a)
     if a!=-1 and b!=-1:
-        c=s[:a]+"good"+s[b+3:]
-        return c
+        return s[:a]+"good"+s[b+3:]
     else:
         return s
 # print(not_bad(a))
