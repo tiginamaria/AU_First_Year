@@ -16,7 +16,7 @@ def verbing(s):
         else:
             return(s+"ing")
     else:
-        return(s)
+        return s
 # print(verbing(a))
 
 
@@ -32,12 +32,11 @@ def verbing(s):
 def not_bad(s):
     a=s.find('not')
     b=s.find('bad',a)
-    c=""
     if a!=-1 and b!=-1:
-            c=s[0:a]+"good"+s[b+3:]
-            return(c)
+        c=s[:a]+"good"+s[b+3:]
+        return c
     else:
-            return (s)
+        return s
 # print(not_bad(a))
 
 # Consider dividing a string into two halves.
@@ -57,5 +56,5 @@ def front_back(x, y):
     xb=x[len(xf):]
     yf=y[:(len(y)+1)//2]
     yb=y[len(yf):]
-    return(xf+yf+xb+yb)
-print(front_back(a,b))
+    return xf+yf+xb+yb
+#print(front_back(a,b))
