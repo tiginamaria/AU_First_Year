@@ -96,5 +96,5 @@ n_sq = 2 ** int(ceil(log(n, 2)))
 a = readm(n, n_sq)
 b = readm(n, n_sq)
 
-
+ 
 printm (strassen(a, b, n_sq), n)
