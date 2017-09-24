@@ -33,7 +33,7 @@ def printfiles(dicts):
  
  
 if __name__ == '__main__':
-    folders = sys.argv[1]
+    folders = sys.argv[1] 
     printfiles(dfind(folders))
    
 
