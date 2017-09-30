@@ -35,11 +35,10 @@ def strassen(a, b):
         c12 = p3 + p5
         c21 = p2 + p4
         c22 = p1 - p2 + p3 + p6
-        return np.vstack(
-        (
-        np.hstack((c11, c12)), 
-        np.hstack((c21, c22)))
-        )
+        return np.vstack((
+            np.hstack((c11, c12)),
+            np.hstack((c21, c22))
+        ))
 
 
 def main():
