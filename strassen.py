@@ -1,5 +1,4 @@
 import numpy as np
-from math import log, ceil
 
 
 def matrix_read(n):
@@ -7,7 +6,6 @@ def matrix_read(n):
 
 
 def matrix_print(m):
-    n = m.shape[0]
     for row in m:
         print(*row)
 
@@ -37,7 +35,11 @@ def strassen(a, b):
         c12 = p3 + p5
         c21 = p2 + p4
         c22 = p1 - p2 + p3 + p6
-        return np.hstack((np.vstack((c11, c21)), np.vstack((c12, c22))))
+        return np.vstack(
+        (
+        np.hstack((c11, c12)), 
+        np.hstack((c21, c22)))
+        )
 
 
 def main():
