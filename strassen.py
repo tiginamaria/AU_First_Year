@@ -18,7 +18,7 @@ def matrix_split(m):
 
 
 def strassen(a, b):
-    n = a.shape[0]
+    n, _ = a.shape
     if n == 1:
         return a * b
     else:
@@ -44,7 +44,7 @@ def strassen(a, b):
 def main():
     n = int(input())
     size = 1
-    while (size < n):
+    while size < n:
         size *= 2
     x = np.zeros((size, size), dtype=np.int)
     y = np.zeros_like(x)
