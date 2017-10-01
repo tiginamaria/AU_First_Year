@@ -18,13 +18,10 @@ def dup_find(parent):
     file_dups = defaultdict(list)
     for root, _, files in os.walk(parent):
         for f_name in files:
-            if not (f_name.startswith(('.', '~')) and os.path.islink(f_name)):
-                    path = os.path.join(os.path.realpath(root), f_name)
+            path = os.path.join(os.path.realpath(root), f_name)
+            if not (f_name.startswith(('.', '~')) and os.path.islink(path)):
                     hashf = file_hash(path)
-                    if hashf in file_dups:
-                        file_dups[hashf].append(path)
-                    else:
-                        file_dups[hashf] = [path]
+                    file_dups[hashf].append(path)
     return file_dups
 
 
