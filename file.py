@@ -4,37 +4,37 @@ import os
 from collections import defaultdict
 
 
-def file_hash(path):
-    mod = 2**10
-    with open(path, 'rb') as x:
+def hash_file(path):
+    block_size = 2**10
+    with open(path, 'rb') as f:
         hasher = hashlib.md5()
-        tmp = x.read(mod)
+        tmp = f.read(block_size)
         while tmp:
             hasher.update(tmp)
-            tmp = x.read(mod)
+            tmp = f.read(block_size)
         return hasher.hexdigest()
 
 
-def dup_find(parent):
-    file_dup = defaultdict(list)
+def find_duplicates(parent):
+    key_to_value = defaultdict(list)
     for root, _, files in os.walk(parent):
         for f_name in files:
             path = os.path.join(root, f_name)
             if not f_name.startswith(('.', '~')) and not os.path.islink(path):
-                    hashf = file_hash(path)
-                    file_dup[hashf].append(os.path.relpath(path, start=parent))
-    return file_dup
+                hashf = hash_file(path)
+                key_to_value[hashf].append(os.path.relpath(path, start=parent))
+    return key_to_value
 
 
-def file_print(file_dup):
-    for files in file_dup.values():
+def print_files(key_to_value):
+    for files in key_to_value.values():
         if len(files) > 1:
             print(':'.join(files))
 
 
 def main():
     folders = sys.argv[1]
-    file_print(dup_find(folders))
+    print_files(find_duplicates(folders))
 
 
 if __name__ == '__main__':
