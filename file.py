@@ -1,6 +1,6 @@
 import sys
 import hashlib
-mport os
+import os
 
 
 def fhash(path, mod=8192):
@@ -17,20 +17,19 @@ def dfind(parent):
     fdups = {}
     for folders, _, files in os.walk(parent):
         for fname in files:
-            if fname[0] != '.' and fname[0] != '~'
-            and not(os.path.islink(fname)):
-                path = os.path.join(folders, fname)
-                hashf = fhash(path)
-                if hashf in fdups:
-                    fdups[hashf].append(path)
-                else:
-                    fdups[hashf] = [path]
+            if fname[0] != '.' and fname[0] != '~':
+                if not(os.path.islink(fname)):
+                    path = os.path.join(os.path.realpath(folders), fname)
+                    hashf = fhash(path)
+                    if hashf in fdups:
+                        fdups[hashf].append(path)
+                    else:
+                        fdups[hashf] = [path]
     return fdups
 
 
 def fprint(dicts):
-    alls = list(filter(lambda x: len(x) > 1, dicts.values()))
-    for files in alls:
+    for files in filter(lambda x: len(x) > 1, dicts.values()):
         print(':'.join(files))
 
 
