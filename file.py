@@ -16,18 +16,18 @@ def hash_file(path):
 
 
 def find_duplicates(parent):
-    file_to_hash = defaultdict(list)
+    hash_to_files = defaultdict(list)
     for root, _, files in os.walk(parent):
         for f_name in files:
             path = os.path.join(root, f_name)
             if not f_name.startswith(('.', '~')) and not os.path.islink(path):
-                hashf = file_to_hash(path)
-                file_to_hash[hashf].append(os.path.relpath(path, start=parent))
-    return file_to_hash
+                hashf = hash_file(path)
+                hash_to_files[hashf].append(os.path.relpath(path, start=parent))
+    return hash_to_files
 
 
-def print_files(file_to_hash):
-    for files in file_to_hash.values():
+def print_files(hash_to_files):
+    for files in hash_to_files.values():
         if len(files) > 1:
             print(':'.join(files))
 
