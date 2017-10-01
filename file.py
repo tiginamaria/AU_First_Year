@@ -1,41 +1,42 @@
 import sys
 import hashlib
 import os
+from collections import defaultdict
 
 
-def fhash(path, mod=8192):
+def file_hash(path, mod=8192):
     with open(path, 'rb') as x:
         hasher = hashlib.md5()
         tmp = x.read(mod)
         while tmp:
             hasher.update(tmp)
             tmp = x.read(mod)
-    return hasher.hexdigest()
+        return hasher.hexdigest()
 
 
-def dfind(parent):
-    fdups = {}
-    for folders, _, files in os.walk(parent):
-        for fname in files:
-            if fname[0] != '.' and fname[0] != '~':
-                if not(os.path.islink(fname)):
-                    path = os.path.join(os.path.realpath(folders), fname)
-                    hashf = fhash(path)
-                    if hashf in fdups:
-                        fdups[hashf].append(path)
+def dup_find(parent):
+    file_dups = defaultdict(list)
+    for root, _, files in os.walk(parent):
+        for f_name in files:
+            if not (f_name.startswith(('.', '~')) and os.path.islink(f_name)):
+                    path = os.path.join(os.path.realpath(root), f_name)
+                    hashf = file_hash(path)
+                    if hashf in file_dups:
+                        file_dups[hashf].append(path)
                     else:
-                        fdups[hashf] = [path]
-    return fdups
+                        file_dups[hashf] = [path]
+    return file_dups
 
 
-def fprint(dicts):
-    for files in filter(lambda x: len(x) > 1, dicts.values()):
-        print(':'.join(files))
+def file_print(file_dups):
+    for files in file_dups.values():
+        if len(files) > 1:
+            print(':'.join(files))
 
 
 def main():
     folders = sys.argv[1]
-    fprint(dfind(folders))
+    file_print(dup_find(folders))
 
 
 if __name__ == '__main__':
