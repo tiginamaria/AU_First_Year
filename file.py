@@ -4,7 +4,8 @@ import os
 from collections import defaultdict
 
 
-def file_hash(path, mod=8192):
+def file_hash(path):
+    mod = 2**10
     with open(path, 'rb') as x:
         hasher = hashlib.md5()
         tmp = x.read(mod)
@@ -15,18 +16,18 @@ def file_hash(path, mod=8192):
 
 
 def dup_find(parent):
-    file_dups = defaultdict(list)
+    file_dup = defaultdict(list)
     for root, _, files in os.walk(parent):
         for f_name in files:
-            path = os.path.join(os.path.realpath(root), f_name)
+            path = os.path.join(root, f_name)
             if not (f_name.startswith(('.', '~')) and os.path.islink(path)):
                     hashf = file_hash(path)
-                    file_dups[hashf].append(path)
-    return file_dups
+                    file_dup[hashf].append(os.path.relpath(path, start=parent))
+    return file_dup
 
 
-def file_print(file_dups):
-    for files in file_dups.values():
+def file_print(file_dup):
+    for files in file_dup.values():
         if len(files) > 1:
             print(':'.join(files))
 
