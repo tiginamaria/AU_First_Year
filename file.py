@@ -15,14 +15,14 @@ def hash_file(path):
         return hasher.hexdigest()
 
 
-def find_duplicates(parent):
+def find_duplicates(main):
     hash_to_files = defaultdict(list)
-    for root, _, files in os.walk(parent):
+    for root, _, files in os.walk(main):
         for f_name in files:
             path = os.path.join(root, f_name)
             if not f_name.startswith(('.', '~')) and not os.path.islink(path):
                 hashf = hash_file(path)
-                hash_to_files[hashf].append(os.path.relpath(path, start=parent))
+                hash_to_files[hashf].append(os.path.relpath(path, start=main))
     return hash_to_files
 
 
