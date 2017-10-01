@@ -20,7 +20,7 @@ def dup_find(parent):
     for root, _, files in os.walk(parent):
         for f_name in files:
             path = os.path.join(root, f_name)
-            if not (f_name.startswith(('.', '~')) and os.path.islink(path)):
+            if not f_name.startswith(('.', '~')) and not os.path.islink(path):
                     hashf = file_hash(path)
                     file_dup[hashf].append(os.path.relpath(path, start=parent))
     return file_dup
