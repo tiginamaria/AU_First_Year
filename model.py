@@ -24,18 +24,18 @@ class Number:
 
     def __hash__(self):
         return hash(self.value)
-    
+
     def evaluate(self, scope):
         return self
 
 
 def ops_to_numbers(node, scope):
         op = None
-        for ops in node or [None]:
+        for ops in node or []:
             op = ops.evaluate(scope)
         return op
 
-      
+
 class Function:
 
     def __init__(self, args, body):
@@ -64,9 +64,8 @@ class Conditional:
         self.is_true = if_true
         self.is_false = if_false
 
-
     def evaluate(self, scope):
-        if  self.condition.evaluate(scope).value == 0:
+        if self.condition.evaluate(scope).value == 0:
             return ops_to_numbers(self.is_false, scope)
         else:
             return ops_to_numbers(self.is_true, scope)
@@ -219,23 +218,29 @@ def my_tests():
     read_z = Read('z')
     print('Teacher: z = ', end=' ')
     read_z.evaluate(teacher)
-    dif = BinaryOperation(teacher['x'], '-', teacher['y'])
+    subtr = BinaryOperation(teacher['x'], '-', teacher['y'])
     print('Teacher: x - y > z ? ')
     print('Student: x - y > z ', end=' ')
     FunctionCall(FunctionDefinition(
         'subtr_compare', calculus['subtr_compare']),
-        [dif, teacher['z']]).evaluate(teacher)
+        [subtr, teacher['z']]).evaluate(teacher)
     cond = BinaryOperation(teacher['x'], '>=', teacher['y'])
-    cond1 = BinaryOperation(teacher['x'], '>=', teacher['y'])    
+    cond1 = BinaryOperation(teacher['x'], '>=', teacher['y'])
     print('Teacher: if (x - y != z) then write(x) else write(z)  ? ')
     print('Student: ..thinking.. ', end=' ')
     Print(Conditional(BinaryOperation(
-        dif, '!=', teacher['z']),
+        subtr, '!=', teacher['z']),
         [teacher['x']], [teacher['z']])).evaluate(teacher)
     print('Teacher: My favorite number is 10?')
     a = Number(10)
-    print('Student:', end=' ')
+    print('Student: ', end=' ')
     print(a == teacher['x'])
+    print('Student: if (x < y) then (y) else (nothing) ?')
+    print('Teacher: Such things are forbidden!!!')
+    assert None is Conditional(
+        BinaryOperation(teacher['x'], '<', subtr),
+        [teacher['y']]).evaluate(teacher)
+
 
 if __name__ == '__main__':
     example()
