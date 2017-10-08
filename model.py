@@ -1,5 +1,4 @@
 class Scope:
-
     def __init__(self, parent=None):
         self.parent = parent
         self.dictionary = {}
@@ -15,7 +14,6 @@ class Scope:
 
 
 class Number:
-
     def __init__(self, value):
         self.value = value
 
@@ -29,15 +27,14 @@ class Number:
         return self
 
 
-def ops_to_numbers(node, scope):
+def evaluate_sequence(sequence, scope):
         op = None
-        for ops in node or []:
+        for ops in sequence or []:
             op = ops.evaluate(scope)
         return op
 
 
 class Function:
-
     def __init__(self, args, body):
         self.args = args
         self.body = body
@@ -47,7 +44,6 @@ class Function:
 
 
 class FunctionDefinition:
-
     def __init__(self, name, function):
         self.name = name
         self.function = function
@@ -58,21 +54,19 @@ class FunctionDefinition:
 
 
 class Conditional:
-
     def __init__(self, condition, if_true, if_false=None):
         self.condition = condition
         self.is_true = if_true
         self.is_false = if_false
 
     def evaluate(self, scope):
-        if self.condition.evaluate(scope).value == 0:
-            return ops_to_numbers(self.is_false, scope)
+        if self.condition.evaluate(scope) == Number(0):
+            return evaluate_sequence(self.is_false, scope)
         else:
-            return ops_to_numbers(self.is_true, scope)
+            return evaluate_sequence(self.is_true, scope)
 
 
 class Print:
-
     def __init__(self, expr):
         self.expr = expr
 
@@ -83,7 +77,6 @@ class Print:
 
 
 class Read:
-
     def __init__(self, name):
         self.name = name
 
@@ -93,7 +86,6 @@ class Read:
 
 
 class FunctionCall:
-
     def __init__(self, fun_expr, args):
         self.fun_expr = fun_expr
         self.args = args
@@ -103,11 +95,10 @@ class FunctionCall:
         call_scope = Scope(scope)
         for arg, arg_value in list(zip(function.args, self.args)):
             call_scope[arg] = arg_value.evaluate(scope)
-        return ops_to_numbers(function.body, call_scope)
+        return evaluate_sequence(function.body, call_scope)
 
 
 class Reference:
-
     def __init__(self, name):
         self.name = name
 
@@ -116,8 +107,7 @@ class Reference:
 
 
 class BinaryOperation:
-
-    ops = {
+    OPS = {
         '+': lambda a, b: a + b,
         '-': lambda a, b: a - b,
         '*': lambda a, b: a * b,
@@ -141,12 +131,11 @@ class BinaryOperation:
     def evaluate(self, scope):
         r_value = self.lhs.evaluate(scope).value
         l_value = self.rhs.evaluate(scope).value
-        return Number(self.ops[self.op](r_value, l_value))
+        return Number(self.OPS[self.op](r_value, l_value))
 
 
 class UnaryOperation:
-
-    ops = {
+    OPS = {
         '-': lambda a: -a,
         '!': lambda a: int(not a)
     }
@@ -157,11 +146,10 @@ class UnaryOperation:
 
     def evaluate(self, scope):
         expr_value = self.expr.evaluate(scope).value
-        return Number(self.ops[self.op](expr_value))
+        return Number(self.OPS[self.op](expr_value))
 
 
 def example():
-
     parent = Scope()
     parent["foo"] = Function(
         ('hello', 'world'),
@@ -178,7 +166,6 @@ def example():
 
 
 def my_tests():
-
     calculus = Scope()
     calculus['sum'] = Function(
         ('a', 'b'),
@@ -205,16 +192,19 @@ def my_tests():
     read_y.evaluate(teacher)
     print('Teacher: x + y = ? ')
     print('Student: x + y = ', end=' ')
-    FunctionCall(FunctionDefinition('sum', calculus['sum']),
-                 [teacher['x'], teacher['y']]).evaluate(teacher)
+    FunctionCall(
+        FunctionDefinition('sum', calculus['sum']),
+        [teacher['x'], teacher['y']]).evaluate(teacher)
     print('Teacher: x / y = ? ')
     print('Student: x / y = ', end=' ')
-    FunctionCall(FunctionDefinition('div', calculus['div']),
-                 [teacher['x'], teacher['y']]).evaluate(teacher)
+    FunctionCall(
+        FunctionDefinition('div', calculus['div']),
+        [teacher['x'], teacher['y']]).evaluate(teacher)
     print('Teacher: x < y ? ')
     print('Student: x < y ', end=' ')
-    FunctionCall(FunctionDefinition('compare', calculus['compare']),
-                 [teacher['x'], teacher['y']]).evaluate(teacher)
+    FunctionCall(
+        FunctionDefinition('compare', calculus['compare']),
+        [teacher['x'], teacher['y']]).evaluate(teacher)
     read_z = Read('z')
     print('Teacher: z = ', end=' ')
     read_z.evaluate(teacher)
