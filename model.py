@@ -1,22 +1,17 @@
-import operator
-
-
 class Scope:
 
     def __init__(self, parent=None):
         self.parent = parent
-        self.dict = {}
+        self.dictionary = {}
 
     def __getitem__(self, key):
-        if key in self.dict:
-            return self.dict[key]
-        elif self.parent:
+        if key in self.dictionary:
+            return self.dictionary[key]
+        else self.parent:
             return self.parent[key]
-        else:
-            return Number(None)
 
     def __setitem__(self, key, value):
-        self.dict[key] = value
+        self.dictionary[key] = value
 
 
 class Number:
@@ -25,13 +20,20 @@ class Number:
         self.value = value
 
     def __eq__(self, other):
-        return self.value == other.value
+        return self is other
 
     def __hash__(self):
         return hash(self.value)
 
     def evaluate(self, scope):
         return self
+
+
+def extract_expr(node, scope):
+        op = None
+        for ops in node or None:
+            op = ops.evaluate(scope)
+        return op
 
 
 class Function:
@@ -62,18 +64,11 @@ class Conditional:
         self.is_true = if_true
         self.is_false = if_false
 
-    def __sequence__(self, node, scope):
-        next_op = Number(None)
-        if node:
-            for op in node:
-                next_op = op.evaluate(scope)
-        return next_op
-
     def evaluate(self, scope):
         if self.condition.evaluate(scope).value == 0:
-            return self.__sequence__(self.is_false, scope)
+            return extract_expr(self.is_false, scope)
         else:
-            return self.__sequence__(self.is_true, scope)
+            return extract_expr(self.is_true, scope)
 
 
 class Print:
@@ -82,9 +77,9 @@ class Print:
         self.expr = expr
 
     def evaluate(self, scope):
-        var = self.expr.evaluate(scope)
-        print(var.value)
-        return var
+        obj = self.expr.evaluate(scope)
+        print(obj.value)
+        return obj
 
 
 class Read:
@@ -106,12 +101,9 @@ class FunctionCall:
     def evaluate(self, scope):
         function = self.fun_expr.evaluate(scope)
         call_scope = Scope(scope)
-        for i, arg in enumerate(function.args):
-            call_scope[arg] = self.args[i].evaluate(scope)
-        next_op = Number(None)
-        for op in function.body:
-            next_op = op.evaluate(call_scope)
-        return next_op
+        for arg, arg_value in list(zip(function.args, self.args)):
+            call_scope[arg] = arg_value.evaluate(scope)
+        return extract_expr(function.body, call_scope)
 
 
 class Reference:
@@ -129,8 +121,8 @@ class BinaryOperation:
         '+': lambda a, b: a + b,
         '-': lambda a, b: a - b,
         '*': lambda a, b: a * b,
-        '/': lambda a, b: None if (b == 0) else a // b,
-        '%': lambda a, b: None if (b == 0) else a % b,
+        '/': lambda a, b: a // b,
+        '%': lambda a, b: a % b,
         '==': lambda a, b: int(a == b),
         '!=': lambda a, b: int(a != b),
         '<': lambda a, b: int(a < b),
@@ -147,15 +139,15 @@ class BinaryOperation:
         self.rhs = rhs
 
     def evaluate(self, scope):
-        a = self.lhs.evaluate(scope).value
-        b = self.rhs.evaluate(scope).value
-        return Number(self.ops[self.op](a, b))
+        r_value = self.lhs.evaluate(scope).value
+        l_value = self.rhs.evaluate(scope).value
+        return Number(self.ops[self.op](r_value, l_value))
 
 
 class UnaryOperation:
 
     ops = {
-        '-': lambda a: a if (a == 0) else -a,
+        '-': lambda a: -a,
         '!': lambda a: int(not a)
     }
 
@@ -164,8 +156,8 @@ class UnaryOperation:
         self.expr = expr
 
     def evaluate(self, scope):
-        a = self.expr.evaluate(scope).value
-        return Number(self.ops[self.op](a))
+        expr_value = self.expr.evaluate(scope).value
+        return Number(self.ops[self.op](expr_value))
 
 
 def example():
@@ -194,50 +186,58 @@ def my_tests():
     calculus['div'] = Function(
         ('a', 'b'),
         [Print(BinaryOperation(Reference('a'), '/', Reference('b')))])
-    calculus['dif'] = Function(
+    calculus['subtr'] = Function(
         ('a', 'b'),
         [Print(BinaryOperation(Reference('a'), '-', Reference('b')))])
     calculus['compare'] = Function(
         ('a', 'b'),
         [Print(BinaryOperation(Reference('a'), '<', Reference('b')))])
-    calculus['dif_compare'] = Function(
+    calculus['subtr_compare'] = Function(
         ('a', 'b'),
         [Print(BinaryOperation(Reference('a'), '>', Reference('b')))])
 
     teacher = Scope(calculus)
     read_x = Read('x')
     read_y = Read('y')
-    print('Teacher x = ', end=' ')
+    print('Teacher: x = ', end=' ')
     read_x.evaluate(teacher)
-    print('Teacher y = ', end=' ')
+    print('Teacher: y = ', end=' ')
     read_y.evaluate(teacher)
-    print('Teacher x + y = ? ')
-    print('Student x + y = ', end=' ')
+    print('Teacher: x + y = ? ')
+    print('Student: x + y = ', end=' ')
     FunctionCall(FunctionDefinition('sum', calculus['sum']),
                  [teacher['x'], teacher['y']]).evaluate(teacher)
-    print('Teacher x / y = ? ')
-    print('Student x / y = ', end=' ')
+    print('Teacher: x / y = ? ')
+    print('Student: x / y = ', end=' ')
     FunctionCall(FunctionDefinition('div', calculus['div']),
                  [teacher['x'], teacher['y']]).evaluate(teacher)
-    print('Teacher x < y ? ')
-    print('Student x < y ', end=' ')
+    print('Teacher: x < y ? ')
+    print('Student: x < y ', end=' ')
     FunctionCall(FunctionDefinition('compare', calculus['compare']),
                  [teacher['x'], teacher['y']]).evaluate(teacher)
     read_z = Read('z')
-    print('Teacher z = ', end=' ')
+    print('Teacher: z = ', end=' ')
     read_z.evaluate(teacher)
     dif = BinaryOperation(teacher['x'], '-', teacher['y'])
-    print('Teacher x - y > z ? ')
-    print('Student x - y > z ', end=' ')
+    print('Teacher: x - y > z ? ')
+    print('Student: x - y > z ', end=' ')
     FunctionCall(FunctionDefinition(
-        'dif_compare', calculus['dif_compare']),
+        'subtr_compare', calculus['subtr_compare']),
         [dif, teacher['z']]).evaluate(teacher)
     cond = BinaryOperation(teacher['x'], '>=', teacher['y'])
-    print('Teacher if (x - y != z) then write(x) else write(z)  ? ')
-    print('Student ..thinking.. ', end=' ')
+    print('Teacher: if (x - y != z) then write(x) else write(z)  ? ')
+    print('Student: ..thinking.. ', end=' ')
     Print(Conditional(BinaryOperation(
         dif, '!=', teacher['z']),
-        [teacher['x']], [teacher['z']])).evaluate(teacher)
+        [teacher['x']], [teacher['x']])).evaluate(teacher)
+    print('Teacher: My favorite number is 10?')
+    a = Number(10)
+    print('Student:', end=' ')
+    print(a == teacher['x'])
+    print('Teacher: Hash favorite number !')
+    print('Student: hash(10) =', end=' ')
+    d1 = {1: teacher['x']}
+    print(hash(d1[1]))
 
 
 if __name__ == '__main__':
