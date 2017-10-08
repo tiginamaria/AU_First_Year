@@ -28,10 +28,10 @@ class Number:
 
 
 def evaluate_sequence(sequence, scope):
-    op = None
-    for ops in sequence or []:
-        op = ops.evaluate(scope)
-    return op
+    result = None
+    for operation in sequence or []:
+        result = operation.evaluate(scope)
+    return result
 
 
 class Function:
