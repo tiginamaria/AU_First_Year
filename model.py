@@ -93,7 +93,7 @@ class FunctionCall:
     def evaluate(self, scope):
         function = self.fun_expr.evaluate(scope)
         call_scope = Scope(scope)
-        for arg, arg_value in list(zip(function.args, self.args)):
+        for arg, arg_value in zip(function.args, self.args):
             call_scope[arg] = arg_value.evaluate(scope)
         return evaluate_sequence(function.body, call_scope)
 
@@ -129,9 +129,9 @@ class BinaryOperation:
         self.rhs = rhs
 
     def evaluate(self, scope):
-        r_value = self.lhs.evaluate(scope).value
-        l_value = self.rhs.evaluate(scope).value
-        return Number(self.OPS[self.op](r_value, l_value))
+        l_value = self.lhs.evaluate(scope).value
+        r_value = self.rhs.evaluate(scope).value
+        return Number(self.OPS[self.op](l_value, r_value))
 
 
 class UnaryOperation:
