@@ -13,7 +13,7 @@ class Scope:
         elif self.parent:
             return self.parent[key]
         else:
-            return Number(666)
+            return Number(None)
 
     def __setitem__(self, key, value):
         self.dict[key] = value
@@ -23,6 +23,12 @@ class Number:
 
     def __init__(self, value):
         self.value = value
+
+    def __eq__(self, other):
+        return self.value == other.value
+
+    def __hash__(self):
+        return hash(self.value)
 
     def evaluate(self, scope):
         return self
@@ -42,7 +48,7 @@ class FunctionDefinition:
 
     def __init__(self, name, function):
         self.name = name
-        self.function = function 
+        self.function = function
 
     def evaluate(self, scope):
         scope[self.name] = self.function
@@ -57,7 +63,7 @@ class Conditional:
         self.is_false = if_false
 
     def __sequence__(self, node, scope):
-        next_op = Number(666)
+        next_op = Number(None)
         if node:
             for op in node:
                 next_op = op.evaluate(scope)
@@ -76,8 +82,9 @@ class Print:
         self.expr = expr
 
     def evaluate(self, scope):
-        print(self.expr.evaluate(scope).value)
-        return self.expr.evaluate(scope)
+        var = self.expr.evaluate(scope)
+        print(var.value)
+        return var
 
 
 class Read:
@@ -101,7 +108,7 @@ class FunctionCall:
         call_scope = Scope(scope)
         for i, arg in enumerate(function.args):
             call_scope[arg] = self.args[i].evaluate(scope)
-        next_op = Number(666)
+        next_op = Number(None)
         for op in function.body:
             next_op = op.evaluate(call_scope)
         return next_op
@@ -122,8 +129,8 @@ class BinaryOperation:
         '+': lambda a, b: a + b,
         '-': lambda a, b: a - b,
         '*': lambda a, b: a * b,
-        '/': lambda a, b: 666 if (b == 0) else a // b,
-        '%': lambda a, b: 666 if (b == 0) else a % b,
+        '/': lambda a, b: None if (b == 0) else a // b,
+        '%': lambda a, b: None if (b == 0) else a % b,
         '==': lambda a, b: int(a == b),
         '!=': lambda a, b: int(a != b),
         '<': lambda a, b: int(a < b),
