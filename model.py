@@ -7,7 +7,7 @@ class Scope:
     def __getitem__(self, key):
         if key in self.dictionary:
             return self.dictionary[key]
-        else self.parent:
+        else:
             return self.parent[key]
 
     def __setitem__(self, key, value):
@@ -236,8 +236,7 @@ def my_tests():
     print(a == teacher['x'])
     print('Teacher: Hash favorite number !')
     print('Student: hash(10) =', end=' ')
-    d1 = {1: teacher['x']}
-    print(hash(d1[1]))
+    print(hash(teacher['x']))
 
 
 if __name__ == '__main__':
