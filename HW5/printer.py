@@ -51,7 +51,7 @@ class PrettyPrinter:
         print(self.tabs * ' ' + '}', end='')
 
     def visit_function_call(self, function_call):
-        print(function_call.fun_expr.name, end='')
+        function_call.fun_expr.accept(self)
         print('(', end='')
         if function_call.args:
             next_arg = 0
@@ -92,6 +92,7 @@ def my_small_test():
                     [UnaryOperation('-', b)])]))
 
     printer.visit(fluffy_penguin)
+    printer.visit(FunctionCall(Reference('fine'), [Number(3), Number(10)]))
 
 
 if __name__ == '__main__':
