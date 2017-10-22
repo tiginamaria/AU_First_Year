@@ -32,16 +32,17 @@ class ConstantFolder:
         lhs = binary_operation.lhs.accept(self)
         rhs = binary_operation.rhs.accept(self)
         opr = binary_operation.op
-        if opr == '*' and type(lhs) == Number
-        and type(rhs) == Reference and lhs.value == 0:
+        l_num = type(lhs) == Number
+        r_num = type(rhs) == Number
+        l_ref = type(lhs) == Reference
+        r_ref = type(rhs) == Reference
+        if opr == '*' and l_num and r_ref and lhs.value == 0:
             return Number(0)
-        if opr == '*' and type(rhs) == Number
-        and type(lhs) == Reference and rhs.value == 0:
+        if opr == '*' and r_num and l_ref and rhs.value == 0:
             return Number(0)
-        if opr == '-' and type(rhs) == Reference
-        and type(lhs) == Reference and lhs.name == rhs.name:
+        if opr == '-' and r_ref and l_ref and lhs.name == rhs.name:
             return Number(0)
-        if type(lhs) == Number and type(rhs) == Number:
+        if l_num and r_num:
             return BinaryOperation(lhs, opr, rhs).evaluate(Scope())
         return BinaryOperation(lhs, opr, rhs)
 
