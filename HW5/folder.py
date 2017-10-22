@@ -1,4 +1,4 @@
-from model import *
+from yat.model import *
 from printer import *
 import sys
 
@@ -49,7 +49,11 @@ class ConstantFolder:
     def visit_unary_operation(self, unary_operation):
         ex = unary_operation.expr.accept(self)
         op = unary_operation.op
-        return UnaryOperation(unary_operation.op, ex).evaluate(Scope())
+        if type(ex) == Number:
+            return UnaryOperation(op, ex).evaluate(Scope())
+        if type(ex) == UnaryOperation or type(ex) == BinaryOperation:
+            ex = ex.expr(self)
+        return UnaryOperation(op, ex)
 
     def visit_function_call(self, function_call):
         fun_expr = function_call.fun_expr.accept(self)
@@ -84,6 +88,9 @@ def tests():
     a = UnaryOperation('-', Number(5))
     printer.visit(a)
     printer.visit(folder.visit(a))
+    a = BinaryOperation(name, '*', UnaryOperation('-', b))
+    printer.visit(a)
+    printer.visit(folder.visit(a))
     c = Conditional(BinaryOperation(
         Number(666), '>', BinaryOperation(
             Number(33), '+', Number(99))), [Number(3)], [Number(5)])
@@ -99,6 +106,11 @@ def tests():
                     [Number(3)], [UnaryOperation('-', Number(999))])]))
     printer.visit(fluffy_penguin)
     printer.visit(folder.visit(fluffy_penguin))
+    f = Function(
+        ('a', 'b'),
+        [Print(BinaryOperation(Reference('a'), '+', Reference('b')))])
+    printer.visit(FunctionCall(FunctionDefinition(
+        'fine', f), [Number(3), Number(10)]))
 
 if __name__ == '__main__':
     tests()
