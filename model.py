@@ -26,6 +26,9 @@ class Number:
     def evaluate(self, scope):
         return self
 
+    def accept(self, visitor):
+        return visitor.visit_number(self)
+
 
 def evaluate_sequence(sequence, scope):
     result = None
@@ -42,6 +45,9 @@ class Function:
     def evaluate(self, scope):
         return self
 
+    def accept(self, visitor):
+        return visitor.visit_function(self)
+
 
 class FunctionDefinition:
     def __init__(self, name, function):
@@ -51,6 +57,9 @@ class FunctionDefinition:
     def evaluate(self, scope):
         scope[self.name] = self.function
         return self.function
+
+    def accept(self, visitor):
+        return visitor.visit_function_definition(self)
 
 
 class Conditional:
@@ -65,6 +74,9 @@ class Conditional:
         else:
             return evaluate_sequence(self.is_true, scope)
 
+    def accept(self, visitor):
+        return visitor.visit_conditional(self)
+
 
 class Print:
     def __init__(self, expr):
@@ -75,6 +87,9 @@ class Print:
         print(obj.value)
         return obj
 
+    def accept(self, visitor):
+        return visitor.visit_print(self)
+
 
 class Read:
     def __init__(self, name):
@@ -83,6 +98,9 @@ class Read:
     def evaluate(self, scope):
         scope[self.name] = Number(int(input()))
         return scope[self.name]
+
+    def accept(self, visitor):
+        return visitor.visit_read(self)
 
 
 class FunctionCall:
@@ -97,6 +115,9 @@ class FunctionCall:
             call_scope[arg] = arg_value.evaluate(scope)
         return evaluate_sequence(function.body, call_scope)
 
+    def accept(self, visitor):
+        return visitor.visit_function_call(self)
+
 
 class Reference:
     def __init__(self, name):
@@ -104,6 +125,9 @@ class Reference:
 
     def evaluate(self, scope):
         return scope[self.name]
+
+    def accept(self, visitor):
+        return visitor.visit_reference(self)
 
 
 class BinaryOperation:
@@ -133,6 +157,9 @@ class BinaryOperation:
         r_value = self.rhs.evaluate(scope).value
         return Number(self.OPS[self.op](l_value, r_value))
 
+    def accept(self, visitor):
+        return visitor.visit_binary_operation(self)
+
 
 class UnaryOperation:
     OPS = {
@@ -148,90 +175,5 @@ class UnaryOperation:
         expr_value = self.expr.evaluate(scope).value
         return Number(self.OPS[self.op](expr_value))
 
-
-def example():
-    parent = Scope()
-    parent["foo"] = Function(
-        ('hello', 'world'),
-        [Print(BinaryOperation(Reference('hello'), '+', Reference('world')))])
-    parent["bar"] = Number(10)
-    scope = Scope(parent)
-    assert 10 == scope["bar"].value
-    scope["bar"] = Number(20)
-    assert scope["bar"].value == 20
-    print('It should print 2: ', end=' ')
-    FunctionCall(
-        FunctionDefinition('foo', parent['foo']),
-        [Number(5), UnaryOperation('-', Number(3))]).evaluate(scope)
-
-
-def my_tests():
-    calculus = Scope()
-    calculus['sum'] = Function(
-        ('a', 'b'),
-        [Print(BinaryOperation(Reference('a'), '+', Reference('b')))])
-    calculus['div'] = Function(
-        ('a', 'b'),
-        [Print(BinaryOperation(Reference('a'), '/', Reference('b')))])
-    calculus['subtr'] = Function(
-        ('a', 'b'),
-        [Print(BinaryOperation(Reference('a'), '-', Reference('b')))])
-    calculus['compare'] = Function(
-        ('a', 'b'),
-        [Print(BinaryOperation(Reference('a'), '<', Reference('b')))])
-    calculus['subtr_compare'] = Function(
-        ('a', 'b'),
-        [Print(BinaryOperation(Reference('a'), '>', Reference('b')))])
-
-    teacher = Scope(calculus)
-    read_x = Read('x')
-    read_y = Read('y')
-    print('Teacher: x = ', end=' ')
-    read_x.evaluate(teacher)
-    print('Teacher: y = ', end=' ')
-    read_y.evaluate(teacher)
-    print('Teacher: x + y = ? ')
-    print('Student: x + y = ', end=' ')
-    FunctionCall(
-        FunctionDefinition('sum', calculus['sum']),
-        [teacher['x'], teacher['y']]).evaluate(teacher)
-    print('Teacher: x / y = ? ')
-    print('Student: x / y = ', end=' ')
-    FunctionCall(
-        FunctionDefinition('div', calculus['div']),
-        [teacher['x'], teacher['y']]).evaluate(teacher)
-    print('Teacher: x < y ? ')
-    print('Student: x < y ', end=' ')
-    FunctionCall(
-        FunctionDefinition('compare', calculus['compare']),
-        [teacher['x'], teacher['y']]).evaluate(teacher)
-    read_z = Read('z')
-    print('Teacher: z = ', end=' ')
-    read_z.evaluate(teacher)
-    subtr = BinaryOperation(teacher['x'], '-', teacher['y'])
-    print('Teacher: x - y > z ? ')
-    print('Student: x - y > z ', end=' ')
-    FunctionCall(FunctionDefinition(
-        'subtr_compare', calculus['subtr_compare']),
-        [subtr, teacher['z']]).evaluate(teacher)
-    cond = BinaryOperation(teacher['x'], '>=', teacher['y'])
-    cond1 = BinaryOperation(teacher['x'], '>=', teacher['y'])
-    print('Teacher: if (x - y != z) then write(x) else write(z)  ? ')
-    print('Student: ..thinking.. ', end=' ')
-    Print(Conditional(BinaryOperation(
-        subtr, '!=', teacher['z']),
-        [teacher['x']], [teacher['z']])).evaluate(teacher)
-    print('Teacher: My favorite number is 10?')
-    a = Number(10)
-    print('Student: ', end=' ')
-    print(a == teacher['x'])
-    print('Student: if (x < y) then (y) else (nothing) ?')
-    print('Teacher: Such things are forbidden!!!')
-    assert None is Conditional(
-        BinaryOperation(teacher['x'], '<', subtr),
-        [teacher['y']]).evaluate(teacher)
-
-
-if __name__ == '__main__':
-    example()
-    my_tests()
+    def accept(self, visitor):
+        return visitor.visit_unary_operation(self)
