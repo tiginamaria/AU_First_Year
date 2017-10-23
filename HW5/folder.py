@@ -1,4 +1,4 @@
-from yat.model import *
+from model import *
 from printer import *
 import sys
 
@@ -51,8 +51,6 @@ class ConstantFolder:
         op = unary_operation.op
         if type(ex) == Number:
             return UnaryOperation(op, ex).evaluate(Scope())
-        if type(ex) == UnaryOperation or type(ex) == BinaryOperation:
-            ex = ex.expr(self)
         return UnaryOperation(op, ex)
 
     def visit_function_call(self, function_call):
@@ -109,8 +107,8 @@ def tests():
     f = Function(
         ('a', 'b'),
         [Print(BinaryOperation(Reference('a'), '+', Reference('b')))])
-    printer.visit(FunctionCall(FunctionDefinition(
-        'fine', f), [Number(3), Number(10)]))
+    printer.visit(FunctionCall(FunctionDefinition('fine', f),
+                 [Number(3), Number(10)]))
 
 if __name__ == '__main__':
     tests()
