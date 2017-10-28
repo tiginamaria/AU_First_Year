@@ -1,4 +1,4 @@
-from model import *
+from yat.model import *
 import sys
 
 
@@ -92,8 +92,8 @@ def my_small_test():
                     [UnaryOperation('-', b)])]))
 
     printer.visit(fluffy_penguin)
-    printer.visit(FunctionCall(Reference('fine'),
-                 [Number(3), Number(10)]))
+    printer.visit(FunctionCall(
+        Reference('fine'), [Number(3), Number(10)]))
 
 
 if __name__ == '__main__':
