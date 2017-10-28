@@ -1,5 +1,5 @@
 from yat.model import *
-from printer import *
+from yat.printer import *
 import sys
 
 
@@ -15,9 +15,14 @@ class ConstantFolder:
             return [expr.accept(self) for expr in exprs]
 
     def visit_conditional(self, cond):
-        return Conditional(cond.condition.accept(self),
-                           self.block_expr(cond.is_true),
-                           self.block_expr(cond.is_false))
+        v_true = []
+        v_false = []
+        for act in cond.is_true:
+            v_true.append(act.accept(self))
+        if cond.is_false:
+            for act in cond.is_false:
+                v_false.append(act.accept(self))
+        return Conditional(cond.condition.accept(self), v_true, v_false)
 
     def visit_reference(self, reference):
         return reference
@@ -28,10 +33,10 @@ class ConstantFolder:
     def visit_read(self, read_expr):
         return read_expr
 
-    def visit_binary_operation(self, binary_operation):
-        lhs = binary_operation.lhs.accept(self)
-        rhs = binary_operation.rhs.accept(self)
-        opr = binary_operation.op
+    def visit_binary_operation(self, bin_op):
+        lhs = bin_op.lhs.accept(self)
+        rhs = bin_op.rhs.accept(self)
+        opr = bin_op.op
         l_num = type(lhs) == Number
         r_num = type(rhs) == Number
         l_ref = type(lhs) == Reference
@@ -46,24 +51,30 @@ class ConstantFolder:
             return BinaryOperation(lhs, opr, rhs).evaluate(Scope())
         return BinaryOperation(lhs, opr, rhs)
 
-    def visit_unary_operation(self, unary_operation):
-        ex = unary_operation.expr.accept(self)
-        op = unary_operation.op
+    def visit_unary_operation(self, un_op):
+        ex = un_op.expr.accept(self)
+        op = un_op.op
         if type(ex) == Number:
             return UnaryOperation(op, ex).evaluate(Scope())
         return UnaryOperation(op, ex)
 
-    def visit_function_call(self, function_call):
-        fun_expr = function_call.fun_expr.accept(self)
-        args = [expr.accept(self) for expr in function_call.args]
-        return FunctionCall(fun_expr, args)
+    def visit_function_definition(self, func_def):
+        return FunctionDefinition(
+            func_def.name, func_def.function.accept(self))
 
-    def visit_function_definition(self, function_definition):
-        args = function_definition.function.args
-        for i in range(len(function_definition.function.body)):
-            function_definition.function.body[i] = self.visit(
-                function_definition.function.body[i])
-        return function_definition
+    def visit_function_call(self, func_call):
+        v_args = []
+        if func_call.args:
+            for arg in func_call.args:
+                v_args.append(arg.accept(self))
+        return FunctionCall(func_call.fun_expr, v_args)
+
+    def visit_function(self, func):
+        v_body = []
+        if func.body:
+            for act in func.body:
+                v_body.append(act.accept(self))
+        return Function(func.args, v_body)
 
 
 def tests():
@@ -104,11 +115,12 @@ def tests():
                     [Number(3)], [UnaryOperation('-', Number(999))])]))
     printer.visit(fluffy_penguin)
     printer.visit(folder.visit(fluffy_penguin))
+    printer.visit(fluffy_penguin)
     f = Function(
         ('a', 'b'),
         [Print(BinaryOperation(Reference('a'), '+', Reference('b')))])
-    printer.visit(FunctionCall(FunctionDefinition('fine', f),
-                 [Number(3), Number(10)]))
+    printer.visit(FunctionCall(
+        FunctionDefinition('fine', f), [Number(3), Number(10)]))
 
 if __name__ == '__main__':
     tests()
