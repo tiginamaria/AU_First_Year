@@ -43,38 +43,38 @@ class PrettyPrinter:
             self.block_exprs(cond.is_false)
             print(self.tabs * ' ' + '}', end='')
 
-    def visit_function_definition(self, function_definition):
+    def visit_function_definition(self, func_def):
         print(
-            'def ' + function_definition.name + '(' + ', '.join(
-                function_definition.function.args) + ') {')
-        self.block_exprs(function_definition.function.body)
+            'def ' + func_def.name + '(' + ', '.join(
+                func_def.function.args) + ') {')
+        self.block_exprs(func_def.function.body)
         print(self.tabs * ' ' + '}', end='')
 
-    def visit_function_call(self, function_call):
-        function_call.fun_expr.accept(self)
+    def visit_function_call(self, func_call):
+        func_call.fun_expr.accept(self)
         print('(', end='')
-        if function_call.args:
+        if func_call.args:
             next_arg = 0
-            for arg in function_call.args:
+            for arg in func_call.args:
                 if next_arg:
                     print(', ', end='')
                 next_arg = 1
                 arg.accept(self)
         print(')', end='')
 
-    def visit_binary_operation(self, binary_operation):
+    def visit_binary_operation(self, bin_op):
         print('(', end='')
-        binary_operation.lhs.accept(self)
+        bin_op.lhs.accept(self)
         print(')', end=' ')
-        print(binary_operation.op, end=' ')
+        print(bin_op.op, end=' ')
         print('(', end='')
-        binary_operation.rhs.accept(self)
+        bin_op.rhs.accept(self)
         print(')', end='')
 
-    def visit_unary_operation(self, unary_operation):
-        print(unary_operation.op, end='')
+    def visit_unary_operation(self, un_op):
+        print(un_op.op, end='')
         print('(', end='')
-        unary_operation.expr.accept(self)
+        un_op.expr.accept(self)
         print(')', end='')
 
 
@@ -92,7 +92,8 @@ def my_small_test():
                     [UnaryOperation('-', b)])]))
 
     printer.visit(fluffy_penguin)
-    printer.visit(FunctionCall(Reference('fine'), [Number(3), Number(10)]))
+    printer.visit(FunctionCall(Reference('fine'),
+                 [Number(3), Number(10)]))
 
 
 if __name__ == '__main__':
