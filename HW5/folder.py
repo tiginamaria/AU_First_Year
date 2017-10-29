@@ -1,5 +1,5 @@
-from yat.model import *
-from yat.printer import *
+from model import *
+from printer import *
 import sys
 
 
@@ -71,7 +71,7 @@ class ConstantFolder:
         if func_call.args:
             for arg in func_call.args:
                 v_args.append(arg.accept(self))
-        return FunctionCall(func_call.fun_expr, v_args)
+        return FunctionCall(func_call.fun_expr.accept(self), v_args)
 
 
 def tests():
