@@ -59,8 +59,12 @@ class ConstantFolder:
         return UnaryOperation(op, ex)
 
     def visit_function_definition(self, func_def):
+        v_body = []
+        if func_def.function.body:
+            for act in func_def.function.body:
+                v_body.append(act.accept(self))
         return FunctionDefinition(
-            func_def.name, func_def.function.accept(self))
+            func_def.name, Function(func_def.function.args, v_body))
 
     def visit_function_call(self, func_call):
         v_args = []
@@ -68,13 +72,6 @@ class ConstantFolder:
             for arg in func_call.args:
                 v_args.append(arg.accept(self))
         return FunctionCall(func_call.fun_expr, v_args)
-
-    def visit_function(self, func):
-        v_body = []
-        if func.body:
-            for act in func.body:
-                v_body.append(act.accept(self))
-        return Function(func.args, v_body)
 
 
 def tests():
