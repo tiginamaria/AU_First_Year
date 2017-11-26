@@ -13,12 +13,13 @@ take' n (x:xs) = x : take' (n - 1) xs
 -- списка, то пустой список. (0,5)
 drop' :: Int -> [a] -> [a]
 drop' 0 xs = xs
+drop' _ [] = []
 drop' n (_:xs) = drop' (n - 1) xs
 -- 5. filter' возвращает список из элементов, для которых f возвращает True (0,5)
 filter' :: (a -> Bool) -> [a] -> [a]
 filter' _ [] = []
-filter' f (x:xs) |(f x) = x : filter' f xs
-                 |otherwise = filter' f xs
+filter' f (x:xs) |       f x = x : filter' f xs
+                 | otherwise = filter' f xs
 -- 6. foldl' последовательно применяет функцию f к элементу списка l и значению,
 -- полученному на предыдущем шаге, начальное значение z (0,5)
 -- foldl' (+) 0 [1, 2, 3] == (((0 + 1) + 2) + 3)
@@ -34,6 +35,6 @@ concat' (x:xs) ys = x : concat' xs  ys
 -- 8. quickSort' возвращает его отсортированный список (0,5)
 -- quickSort' должен быть реализован через алгоритм QuickSort
 -- (выбор pivot может быть любым)
-quicksort' :: Ord a => [a] -> [a]
-quicksort' [] = []
-quicksort' (x:xs) = concat' (quicksort' (filter (<x) xs)) (x:(quicksort' (filter' (>=x) xs)))
+quickSort' :: Ord a => [a] -> [a]
+quickSort' [] = []
+quickSort' (x:xs) = concat' (quickSort' (filter (<x) xs)) (x:(quickSort' (filter' (>=x) xs)))
