@@ -24,5 +24,5 @@ delete :: Ord k => k -> BinaryTree k v -> BinaryTree k v
 delete   _  Leaf = Leaf
 delete key (Branch k v l r) 
     | key > k    = Branch k v l (delete key r)
-    | key < k    = Branch k v   (delete key l) r
+    | key < k    = Branch k v (delete key l) r
     | otherwise  = merge l r
