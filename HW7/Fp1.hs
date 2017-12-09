@@ -37,4 +37,4 @@ concat' (x:xs) ys = x : concat' xs  ys
 -- (выбор pivot может быть любым)
 quickSort' :: Ord a => [a] -> [a]
 quickSort' []     = []
-quickSort' (x:xs) = concat' (quickSort' (filter (<x) xs)) (x:(quickSort' (filter' (>=x) xs)))
+quickSort' (x:xs) = concat' (quickSort' (filter' (<x) xs)) (x:(quickSort' (filter' (>=x) xs)))
