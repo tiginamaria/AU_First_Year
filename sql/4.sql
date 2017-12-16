@@ -1,4 +1,5 @@
-SELECT Country.Name, IFNULL(SUM(City.Population > 1000000), 0) AS MillionCity FROM Country, City
-WHERE City.CountryCode = Country.Code
-GROUP BY CountryCode
-ORDER BY MillionCity DESC;
+SELECT Country.Name, IFNULL(Sum(City.Population >= 1000000), 0) AS MillionCity 
+FROM Country
+JOIN City ON City.CountryCode = Country.Code
+GROUP BY Country.Name
+ORDER BY MillionCity DESC, Country.Name;
