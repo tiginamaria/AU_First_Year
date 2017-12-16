@@ -1,2 +1,4 @@
-SELECT City.Name FROM City, Capital, Country 
-WHERE City.Id = Capital.CityId AND City.CountryCode = Country.Code AND Country.Name LIKE "Malaysia";
+SELECT City.Name FROM
+City JOIN (Country JOIN Capital
+ON Capital.CountryCode = Country.Code)
+ON City.Id = Capital.CityId AND Country.Name = "Malaysia";
