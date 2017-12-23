@@ -17,7 +17,9 @@ void thpool_submit(ThreadPool* pool, Task* task) {
 	pthread_mutex_init(&task->mutex, NULL);
 	pthread_cond_init(&task->cond, NULL);
 	
+	pthread_mutex_lock(&task->mutex);
 	task->status = CONTINIUE;
+	pthread_mutex_unlock(&task->mutex);
 	
 	pthread_mutex_lock(&pool->mutex);
 	pool->task_queue.push(task);
@@ -33,19 +35,29 @@ void thpool_wait(Task* task) {
 }
 
 void thpool_finit(ThreadPool* pool) {
+
+	pthread_mutex_lock(&pool->mutex);
 	pool->status = FINISH;
+	pthread_mutex_unlock(&pool->mutex);
 	
+	pthread_mutex_lock(&pool->mutex);
 	pthread_cond_broadcast(&pool->cond);
+	pthread_mutex_unlock(&pool->mutex);
 	
 	for (size_t i = 0; i < pool->thread.size(); i++)
 		pthread_join(pool->thread[i], NULL);
+			
+	pthread_cond_destroy(&pool->cond);
+	pthread_mutex_destroy(&pool->mutex);
 }
 
 void* func(void* arg) {
 	ThreadPool* pool = (ThreadPool*) arg;
 	while(1) {
 		pthread_mutex_lock(&pool->mutex);
-
+		while (pool->task_queue.empty() && pool->status == CONTINIUE)
+			pthread_cond_wait(&pool->cond, &pool->mutex);
+			
 		if (pool->task_queue.size()) {
 			Task* task = pool->task_queue.front();
 			pool->task_queue.pop();
@@ -58,17 +70,13 @@ void* func(void* arg) {
 			
 			pthread_cond_broadcast(&task->cond);
 			pthread_mutex_unlock(&task->mutex);
+			pthread_mutex_destroy(&task->mutex);
+			pthread_cond_destroy(&task->cond);
 		} else if (pool->task_queue.empty() && pool->status == FINISH) {
 			pthread_mutex_unlock(&pool->mutex);
 			break;
 		} else 
-			pthread_mutex_unlock(&pool->mutex);	
-		
-		pthread_mutex_lock(&pool->mutex);	
-		while (pool->task_queue.empty() && pool->status == CONTINIUE)
-			pthread_cond_wait(&pool->cond, &pool->mutex);
-		pthread_mutex_unlock(&pool->mutex);	
-				
+			pthread_mutex_unlock(&pool->mutex);		
 	}
 	return 0;	
 }
