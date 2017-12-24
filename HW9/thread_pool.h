@@ -26,6 +26,6 @@ void thpool_init(ThreadPool* pool, size_t threads_nm);
 void thpool_submit(ThreadPool* pool, Task* task);
 void thpool_wait(Task* task);
 void thpool_finit(ThreadPool* pool);
-
+void thpool_task_destroy(Task* task); //destroying one task from main(use after finit for all tasks)
 
 

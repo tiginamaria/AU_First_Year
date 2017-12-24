@@ -1,6 +1,7 @@
 #include "thread_pool.h"
+#include <assert.h>
 
-void* func(void* arg);
+void* complete_tasks(void* arg);
 
 void thpool_init(ThreadPool* pool, size_t threads_nm) {
 	pthread_mutex_init(&pool->mutex, NULL);
@@ -10,7 +11,7 @@ void thpool_init(ThreadPool* pool, size_t threads_nm) {
 	
 	pool->thread.resize(threads_nm);
 	for (size_t i = 0; i < threads_nm; i++)
-		pthread_create(&pool->thread[i], NULL, func, pool);
+		pthread_create(&pool->thread[i], NULL, complete_tasks, pool);
 }
 
 void thpool_submit(ThreadPool* pool, Task* task) {
@@ -38,9 +39,6 @@ void thpool_finit(ThreadPool* pool) {
 
 	pthread_mutex_lock(&pool->mutex);
 	pool->status = FINISH;
-	pthread_mutex_unlock(&pool->mutex);
-	
-	pthread_mutex_lock(&pool->mutex);
 	pthread_cond_broadcast(&pool->cond);
 	pthread_mutex_unlock(&pool->mutex);
 	
@@ -51,7 +49,15 @@ void thpool_finit(ThreadPool* pool) {
 	pthread_mutex_destroy(&pool->mutex);
 }
 
-void* func(void* arg) {
+void thpool_task_destroy(Task* task) {
+	pthread_mutex_lock(&task->mutex);
+	assert(task->status == FINISH);
+	pthread_mutex_unlock(&task->mutex);
+	pthread_mutex_destroy(&task->mutex);
+	pthread_cond_destroy(&task->cond);
+}
+
+void* complete_tasks(void* arg) {
 	ThreadPool* pool = (ThreadPool*) arg;
 	while(1) {
 		pthread_mutex_lock(&pool->mutex);
@@ -70,8 +76,7 @@ void* func(void* arg) {
 			
 			pthread_cond_broadcast(&task->cond);
 			pthread_mutex_unlock(&task->mutex);
-			pthread_mutex_destroy(&task->mutex);
-			pthread_cond_destroy(&task->cond);
+
 		} else if (pool->task_queue.empty() && pool->status == FINISH) {
 			pthread_mutex_unlock(&pool->mutex);
 			break;
